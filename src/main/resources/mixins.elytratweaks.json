@@ -1,0 +1,14 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.frostytrix.elytratweaks.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "LocalPlayerMixin",
+    "PlayerEntityMixin"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
