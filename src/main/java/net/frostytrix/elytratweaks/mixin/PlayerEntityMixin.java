@@ -8,7 +8,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(Player.class)
+@Mixin(value = Player.class, priority = 0)
 public abstract class PlayerEntityMixin {
 
     @Inject(method = "tryToStartFallFlying", at = @At("HEAD"), cancellable = true)
