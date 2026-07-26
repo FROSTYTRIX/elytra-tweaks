@@ -1,55 +1,51 @@
 package net.frostytrix.elytratweaks.mixin;
 
 import net.frostytrix.elytratweaks.ClientModEvents;
-import net.frostytrix.elytratweaks.ElytraTweaksModClient;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(LocalPlayer.class)
 public abstract class LocalPlayerMixin {
 
-    // Tracks if the flight was started by your 'G' key
-    @Unique
-    private boolean elytraTweaks$isLegitFlight = false;
-
+    // Handle the mod's dedicated deploy key (default: Left Alt)
     @Inject(method = "aiStep", at = @At("HEAD"))
-    private void onAiStepHead(CallbackInfo ci) {
+    private void elytraTweaks$onAiStep(CallbackInfo ci) {
         LocalPlayer player = (LocalPlayer) (Object) this;
+        if (ClientModEvents.ELYTRA_DEPLOY_KEY == null) return;
 
-        // 1. Reset our legit state when you land or enter water
-        if (!player.isFallFlying()) {
-            this.elytraTweaks$isLegitFlight = false;
-        }
-
-        // 2. Handle the Custom 'G' Key
-        if (ClientModEvents.ELYTRA_DEPLOY_KEY != null) {
-            while (ClientModEvents.ELYTRA_DEPLOY_KEY.consumeClick()) {
-                if (player.isFallFlying()) {
-                    // Turn OFF: We must manually send the toggle packet to stop
-                    player.stopFallFlying();
-                    player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
-                    this.elytraTweaks$isLegitFlight = false;
-                } else {
-                    // Turn ON: tryToStartFallFlying() automatically sends the network packet for us!
-                    if (player.tryToStartFallFlying()) {
-                        this.elytraTweaks$isLegitFlight = true;
-                    }
+        while (ClientModEvents.ELYTRA_DEPLOY_KEY.consumeClick()) {
+            // The server treats START_FALL_FLYING as "start if possible, else stop",
+            // deciding from its own flag. We must send it on BOTH toggle directions so
+            // the client and server flags never drift out of phase — otherwise the first
+            // stop press only re-syncs the server and you'd have to press again.
+            if (player.isFallFlying()) {
+                // Toggle OFF mid-air: fold locally, then tell the server to stop.
+                player.stopFallFlying();
+                player.connection.send(new ServerboundPlayerCommandPacket(
+                        player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+            } else {
+                // Toggle ON: set the client flag, then tell the server to start.
+                if (player.tryToStartFallFlying()) {
+                    player.connection.send(new ServerboundPlayerCommandPacket(
+                            player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
                 }
             }
         }
+    }
 
-        // 3. The Enforcer (The Anti-Spacebar Weapon)
-        // If the spacebar triggered flight, 'isLegitFlight' will be false.
-        if (player.isFallFlying() && !this.elytraTweaks$isLegitFlight) {
-            // Fold the wings instantly
-            player.stopFallFlying();
-            // Send the toggle packet to force the server to stop the spacebar flight too
-            player.connection.send(new ServerboundPlayerCommandPacket(player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
-        }
+    // Block the vanilla jump/spacebar from ever deploying the elytra.
+    // Only affects the call inside aiStep — the mod's own keybind call is untouched.
+    @Redirect(
+            method = "aiStep",
+            at = @At(value = "INVOKE",
+                    target = "Lnet/minecraft/client/player/LocalPlayer;tryToStartFallFlying()Z")
+    )
+    private boolean elytraTweaks$blockVanillaSpacebarDeploy(LocalPlayer instance) {
+        return false;
     }
 }
