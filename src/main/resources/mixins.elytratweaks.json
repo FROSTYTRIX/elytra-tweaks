@@ -4,8 +4,7 @@
   "package": "net.frostytrix.elytratweaks.mixin",
   "compatibilityLevel": "JAVA_25",
   "mixins": [
-    "LocalPlayerMixin",
-    "PlayerEntityMixin"
+    "LocalPlayerMixin"
   ],
   "client": [],
   "injectors": {
