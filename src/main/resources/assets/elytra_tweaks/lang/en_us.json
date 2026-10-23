@@ -1,4 +1,25 @@
 {
   "category.elytratweaks": "Elytra Tweaks",
-  "key.elytratweaks.deploy": "Deploy / Close Elytra"
+  "key.elytratweaks.deploy": "Deploy / Close Elytra",
+  "key.category.elytra_tweaks.controls": "Elytra Tweaks",
+  "key.elytra_tweaks.deploy": "Deploy / Close Elytra",
+
+  "elytra_tweaks.configuration.title": "Elytra Tweaks Settings",
+
+  "elytra_tweaks.configuration.deployKeyMode": "Deploy Key Mode",
+  "elytra_tweaks.configuration.deployKeyMode.tooltip": "Toggle: press to open the elytra, press again to close it. Hold: the elytra stays open only while the key is held.",
+  "elytra_tweaks.configuration.deployKeyMode.toggle": "Toggle",
+  "elytra_tweaks.configuration.deployKeyMode.hold": "Hold",
+
+  "elytra_tweaks.configuration.jumpDeploy": "Jump Key Deploy",
+  "elytra_tweaks.configuration.jumpDeploy.tooltip": "Whether the vanilla jump key can still open the elytra while falling.",
+  "elytra_tweaks.configuration.jumpDeploy.blocked": "Blocked",
+  "elytra_tweaks.configuration.jumpDeploy.with_firework": "Only With Firework",
+  "elytra_tweaks.configuration.jumpDeploy.vanilla": "Vanilla",
+
+  "elytra_tweaks.configuration.safetyNet": "Safety Net",
+  "elytra_tweaks.configuration.safetyNet.tooltip": "Folds the wings when the elytra opens in a way the Jump Key Deploy setting doesn't allow (for example through another mod). Turning it off removes the one-frame flicker some modpacks show, but those deploys are then no longer stopped.",
+
+  "elytra_tweaks.configuration.windVolume": "Wind Sound Volume (%)",
+  "elytra_tweaks.configuration.windVolume.tooltip": "Volume of the wind sound while gliding. 0 mutes it, 100 is vanilla."
 }

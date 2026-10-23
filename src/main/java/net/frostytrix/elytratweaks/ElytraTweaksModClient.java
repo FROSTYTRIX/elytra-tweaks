@@ -1,11 +1,11 @@
 package net.frostytrix.elytratweaks;
 
-import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -16,7 +16,10 @@ import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 @EventBusSubscriber(modid = ElytraTweaksMod.MOD_ID, value = Dist.CLIENT)
 public class ElytraTweaksModClient {
     public ElytraTweaksModClient(ModContainer container) {
-
+        // Every setting is client-side, so it lives in elytra_tweaks-client.toml.
+        container.registerConfig(ModConfig.Type.CLIENT, Config.SPEC);
+        // In-game config screen, reachable from the Mods list.
+        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 
     @SubscribeEvent
