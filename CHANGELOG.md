@@ -2,6 +2,29 @@
 
 All notable changes to ElytraTweaks are documented here.
 
+## [1.1.0]
+
+### Added
+- **In-game settings screen** (Mods list → Elytra Tweaks → Config). Settings are
+  saved in `config/elytra_tweaks-client.toml`.
+- **Deploy Key Mode:** `Toggle` (press to open, press again to close; default)
+  or `Hold` (the elytra stays open only while the key is held).
+- **Jump Key Deploy:** choose what the vanilla jump key may do while falling:
+  - `Blocked` (default): never opens the elytra, as in 1.0.5.
+  - `Only With Firework`: opens it only while you hold a firework rocket in
+    either hand, so normal jumps and jump-crits never deploy it.
+  - `Vanilla`: opens it like vanilla.
+- **Safety Net** toggle: turn off the reactive wing-folding if it causes the
+  one-frame flicker in your modpack (those mods' deploys are then no longer
+  stopped).
+- **Wind Sound Volume:** 0–100 % slider for the gliding wind sound.
+
+### Fixed
+- The deploy key name and its controls category now show up translated on 26.1.2.
+- The client-only mixins (`LocalPlayer`, elytra sound) are now registered in the
+  client mixin list, so they are no longer applied on a dedicated server, where
+  those classes don't exist.
+
 ## [1.0.5]
 
 ### Changed
