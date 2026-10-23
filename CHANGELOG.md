@@ -18,6 +18,20 @@ All notable changes to ElytraTweaks are documented here.
   one-frame flicker in your modpack (those mods' deploys are then no longer
   stopped).
 - **Wind Sound Volume:** 0–100 % slider for the gliding wind sound.
+- **Firework Takeoff** key (unbound by default, set it in Controls): from the
+  ground it jumps, opens the elytra and fires a rocket in one press. It uses a
+  rocket from either hand, or from the hotbar (switching back to your slot
+  right after). Because it uses an item automatically, check your server's rules.
+- **Flight HUD:** speed, altitude, pitch and elytra durability next to the
+  crosshair while gliding (hidden with F1, can be turned off).
+- **Low Durability Warning:** a sound and a red message once per flight when the
+  elytra is at or below a configurable percentage (default 10 %).
+
+### Changed
+- The default deploy key is now Left Alt on every version (it was G on 26.1.2).
+  Existing installs keep whatever key is already saved in their options.
+- "Jump Key Deploy" now says clearly that it only affects the vanilla jump key;
+  the mod's own deploy key always works.
 
 ### Fixed
 - The deploy key name and its controls category now show up translated on 26.1.2.

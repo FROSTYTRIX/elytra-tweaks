@@ -1,8 +1,10 @@
 {
   "category.elytratweaks": "Elytra Tweaks",
   "key.elytratweaks.deploy": "Deploy / Close Elytra",
+  "key.elytratweaks.takeoff": "Firework Takeoff",
   "key.category.elytra_tweaks.controls": "Elytra Tweaks",
   "key.elytra_tweaks.deploy": "Deploy / Close Elytra",
+  "key.elytra_tweaks.takeoff": "Firework Takeoff",
 
   "elytra_tweaks.configuration.title": "Elytra Tweaks Settings",
 
@@ -12,14 +14,29 @@
   "elytra_tweaks.configuration.deployKeyMode.hold": "Hold",
 
   "elytra_tweaks.configuration.jumpDeploy": "Jump Key Deploy",
-  "elytra_tweaks.configuration.jumpDeploy.tooltip": "Whether the vanilla jump key can still open the elytra while falling.",
+  "elytra_tweaks.configuration.jumpDeploy.tooltip": "Whether the vanilla JUMP key can still open the elytra while falling. The mod's own deploy key always works, whatever this is set to.",
   "elytra_tweaks.configuration.jumpDeploy.blocked": "Blocked",
-  "elytra_tweaks.configuration.jumpDeploy.with_firework": "Only With Firework",
+  "elytra_tweaks.configuration.jumpDeploy.with_firework": "Only While Holding Firework",
   "elytra_tweaks.configuration.jumpDeploy.vanilla": "Vanilla",
 
   "elytra_tweaks.configuration.safetyNet": "Safety Net",
   "elytra_tweaks.configuration.safetyNet.tooltip": "Folds the wings when the elytra opens in a way the Jump Key Deploy setting doesn't allow (for example through another mod). Turning it off removes the one-frame flicker some modpacks show, but those deploys are then no longer stopped.",
 
+  "elytra_tweaks.configuration.flightHud": "Flight HUD",
+  "elytra_tweaks.configuration.flightHud.tooltip": "Shows speed, altitude, pitch and elytra durability next to the crosshair while gliding.",
+
+  "elytra_tweaks.configuration.durabilityWarning": "Low Durability Warning",
+  "elytra_tweaks.configuration.durabilityWarning.tooltip": "Plays a sound and shows a message once per flight when the elytra is about to break.",
+  "elytra_tweaks.configuration.durabilityWarningPercent": "Warning Threshold (%)",
+  "elytra_tweaks.configuration.durabilityWarningPercent.tooltip": "Remaining durability, in percent, at or below which the elytra counts as about to break.",
+
   "elytra_tweaks.configuration.windVolume": "Wind Sound Volume (%)",
-  "elytra_tweaks.configuration.windVolume.tooltip": "Volume of the wind sound while gliding. 0 mutes it, 100 is vanilla."
+  "elytra_tweaks.configuration.windVolume.tooltip": "Volume of the wind sound while gliding. 0 mutes it, 100 is vanilla.",
+
+  "elytra_tweaks.hud.speed": "Speed: %s m/s",
+  "elytra_tweaks.hud.altitude": "Altitude: %s",
+  "elytra_tweaks.hud.pitch": "Pitch: %s°",
+  "elytra_tweaks.hud.durability": "Elytra: %s/%s",
+
+  "elytra_tweaks.message.durability_low": "Elytra about to break: %s durability left"
 }
