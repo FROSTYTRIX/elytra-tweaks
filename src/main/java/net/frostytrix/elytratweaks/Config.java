@@ -16,7 +16,8 @@ public class Config {
             .defineEnum("deployKeyMode", DeployKeyMode.TOGGLE);
 
     public static final ModConfigSpec.EnumValue<JumpDeploy> JUMP_DEPLOY = BUILDER
-            .comment("Whether the vanilla jump key can still open the elytra while falling.",
+            .comment("Whether the vanilla JUMP key can still open the elytra while falling.",
+                    "The mod's own deploy key always works, whatever this is set to.",
                     "BLOCKED: never, only the deploy key opens it.",
                     "WITH_FIREWORK: only while holding a firework rocket in either hand.",
                     "VANILLA: always, like vanilla.")
@@ -27,6 +28,18 @@ public class Config {
                     "for example through another mod. Some modpacks show a one-frame flicker when this",
                     "kicks in; turning it off removes the flicker, but those deploys are then no longer stopped.")
             .define("safetyNet", true);
+
+    public static final ModConfigSpec.BooleanValue FLIGHT_HUD = BUILDER
+            .comment("Show speed, altitude, pitch and elytra durability next to the crosshair while gliding.")
+            .define("flightHud", true);
+
+    public static final ModConfigSpec.BooleanValue DURABILITY_WARNING = BUILDER
+            .comment("Play a sound and show a message once per flight when the elytra is about to break.")
+            .define("durabilityWarning", true);
+
+    public static final ModConfigSpec.IntValue DURABILITY_WARNING_PERCENT = BUILDER
+            .comment("Remaining durability, in percent, at or below which the elytra counts as about to break.")
+            .defineInRange("durabilityWarningPercent", 10, 1, 50);
 
     public static final ModConfigSpec.IntValue WIND_VOLUME = BUILDER
             .comment("Volume of the wind sound while gliding, in percent (0 = muted, 100 = vanilla).")
