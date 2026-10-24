@@ -8,9 +8,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 // Small overlay just below-right of the crosshair while gliding: speed, altitude,
-// pitch and the glider's durability.
+// pitch, firework count and the glider's durability.
 public final class FlightHud {
     private static final int TEXT_COLOR = 0xFFFFFFFF;
     private static final int WARNING_COLOR = 0xFFFFFF55;
@@ -36,6 +37,9 @@ public final class FlightHud {
         lines.add(new Line(tr("altitude", (int) Math.floor(player.getY())), TEXT_COLOR));
         // Minecraft's pitch is negative when looking up; show nose-up as positive.
         lines.add(new Line(tr("pitch", String.format(Locale.ROOT, "%+.0f", -player.getXRot())), TEXT_COLOR));
+        // Hands, hotbar and main inventory.
+        int rockets = player.getInventory().countItem(Items.FIREWORK_ROCKET);
+        lines.add(new Line(tr("rockets", rockets), rockets == 0 ? WARNING_COLOR : TEXT_COLOR));
 
         ItemStack glider = VersionCompat.getGliderStack(player);
         if (!glider.isEmpty() && glider.isDamageableItem()) {

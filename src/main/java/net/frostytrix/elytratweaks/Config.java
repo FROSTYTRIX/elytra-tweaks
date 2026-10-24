@@ -29,6 +29,13 @@ public class Config {
                     "kicks in; turning it off removes the flicker, but those deploys are then no longer stopped.")
             .define("safetyNet", true);
 
+    public static final ModConfigSpec.BooleanValue AUTO_SWAP = BUILDER
+            .comment("When you use the deploy or takeoff key without wearing an elytra, put one on from",
+                    "your inventory, and put your chestplate back when you land.",
+                    "WARNING: this moves items in your inventory for you. Some servers consider that",
+                    "cheating; check the server's rules before turning it on.")
+            .define("autoSwap", false);
+
     public static final ModConfigSpec.BooleanValue FLIGHT_HUD = BUILDER
             .comment("Show speed, altitude, pitch and elytra durability next to the crosshair while gliding.")
             .define("flightHud", true);

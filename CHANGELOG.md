@@ -22,8 +22,14 @@ All notable changes to ElytraTweaks are documented here.
   ground it jumps, opens the elytra and fires a rocket in one press. It uses a
   rocket from either hand, or from the hotbar (switching back to your slot
   right after). Because it uses an item automatically, check your server's rules.
-- **Flight HUD:** speed, altitude, pitch and elytra durability next to the
-  crosshair while gliding (hidden with F1, can be turned off).
+- **Flight HUD:** speed, altitude, pitch, firework rocket count and elytra
+  durability next to the crosshair while gliding (hidden with F1, can be turned
+  off).
+- **Auto Swap Chestplate** (off by default): when you use the deploy or takeoff
+  key without wearing an elytra, it puts one on from your inventory, and puts
+  your chestplate back when you land. It never touches a chestplate with Curse of
+  Binding. **Warning:** this moves items in your inventory for you, which some
+  servers consider cheating. Check the server's rules before turning it on.
 - **Low Durability Warning:** a sound and a red message once per flight when the
   elytra is at or below a configurable percentage (default 10 %).
 

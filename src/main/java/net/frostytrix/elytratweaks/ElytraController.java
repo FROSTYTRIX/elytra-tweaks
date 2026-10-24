@@ -1,5 +1,7 @@
 package net.frostytrix.elytratweaks;
 
+import java.util.function.Predicate;
+
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -9,7 +11,10 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
@@ -18,6 +23,10 @@ import net.minecraft.world.item.Items;
 public final class ElytraController {
     // How long a firework takeoff may wait to leave the ground before giving up.
     private static final int TAKEOFF_TIMEOUT_TICKS = 20;
+    // Chest armor slot in the player's inventory menu (armor slots are HEAD, CHEST, LEGS, FEET).
+    private static final int CHEST_MENU_SLOT = InventoryMenu.ARMOR_SLOT_START + 1;
+    // If no flight follows an auto-swap (e.g. a failed takeoff), put the chestplate back after this.
+    private static final int SWAP_BACK_GRACE_TICKS = 20;
 
     private static LocalPlayer lastPlayer;
     // Whether the current flight is one we want: started by the deploy key or a takeoff,
@@ -31,6 +40,12 @@ public final class ElytraController {
     // Whether the server last told us our player is gliding (from its entity data, see
     // EntityMixin). Folding the wings on the client doesn't change it.
     private static boolean serverGliding;
+    // Auto-swap: whether an elytra was put on for the current flight, and what it replaced
+    // (EMPTY when the chest slot was empty, so there is nothing to put back).
+    private static boolean swapActive;
+    private static ItemStack swappedOut = ItemStack.EMPTY;
+    private static boolean flownSinceSwap;
+    private static int ticksSinceSwap;
 
     private ElytraController() {
     }
@@ -48,6 +63,7 @@ public final class ElytraController {
 
         handleDeployKey(player);
         handleTakeoff(player);
+        swapBackAfterLanding(player);
         applySafetyNet(player);
         warnLowDurability(player);
     }
@@ -67,6 +83,8 @@ public final class ElytraController {
         takeoffTicks = -1;
         durabilityWarned = false;
         serverGliding = false;
+        swapActive = false;
+        swappedOut = ItemStack.EMPTY;
     }
 
     private static void handleDeployKey(LocalPlayer player) {
@@ -104,12 +122,14 @@ public final class ElytraController {
         KeyMapping key = ClientModEvents.TAKEOFF_KEY;
         if (key != null) {
             while (key.consumeClick()) {
-                if (takeoffTicks < 0 && !player.isFallFlying() && !player.isInWater()
-                        && VersionCompat.hasUsableGlider(player) && hasRocket(player)) {
-                    if (player.onGround()) {
-                        player.jumpFromGround();
+                if (takeoffTicks < 0 && !player.isFallFlying() && !player.isInWater() && hasRocket(player)) {
+                    equipGliderFromInventory(player);
+                    if (VersionCompat.hasUsableGlider(player)) {
+                        if (player.onGround()) {
+                            player.jumpFromGround();
+                        }
+                        takeoffTicks = 0;
                     }
-                    takeoffTicks = 0;
                 }
             }
         }
@@ -167,6 +187,10 @@ public final class ElytraController {
     // from its own flag. Sending it on BOTH directions keeps the client and server in
     // phase, so stopping mid-air is a single press.
     private static void deploy(LocalPlayer player) {
+        // Only swap in the air: HOLD mode calls this every tick while the key is held on the ground.
+        if (!player.onGround()) {
+            equipGliderFromInventory(player);
+        }
         // isCustomPress lets this one call through PlayerEntityMixin's client-side block.
         ElytraTweaksState.isCustomPress = true;
         try {
@@ -227,6 +251,89 @@ public final class ElytraController {
             minecraft.gameMode.useItem(player, InteractionHand.MAIN_HAND);
             VersionCompat.setSelectedSlot(inventory, previous);
         }
+    }
+
+    // Auto-swap (opt-in): wear an elytra from the inventory in place of whatever is in the
+    // chest slot, remembering what it replaced so it can go back after landing.
+    private static void equipGliderFromInventory(LocalPlayer player) {
+        if (!Config.AUTO_SWAP.get() || swapActive || VersionCompat.hasUsableGlider(player) || !canUseInventory(player)) {
+            return;
+        }
+        int index = findInventorySlot(player, stack -> VersionCompat.isUsableChestGlider(stack, player));
+        if (index < 0) {
+            return;
+        }
+        Slot chest = player.inventoryMenu.getSlot(CHEST_MENU_SLOT);
+        ItemStack worn = chest.getItem();
+        // Curse of Binding (or a slot that won't take the glider): leave everything as it is.
+        if ((!worn.isEmpty() && !chest.mayPickup(player)) || !chest.mayPlace(player.getInventory().getItem(index))) {
+            return;
+        }
+        swappedOut = worn.copy();
+        swapActive = true;
+        flownSinceSwap = false;
+        ticksSinceSwap = 0;
+        swapChestWith(player, index);
+    }
+
+    private static void swapBackAfterLanding(LocalPlayer player) {
+        if (!swapActive) {
+            return;
+        }
+        ticksSinceSwap++;
+        if (player.isFallFlying()) {
+            flownSinceSwap = true;
+            return;
+        }
+        boolean landed = player.onGround() || player.isInWater();
+        boolean flightOver = flownSinceSwap || ticksSinceSwap >= SWAP_BACK_GRACE_TICKS;
+        if (!landed || !flightOver || takeoffTicks >= 0 || !canUseInventory(player)) {
+            return;
+        }
+        swapActive = false;
+        ItemStack original = swappedOut;
+        swappedOut = ItemStack.EMPTY;
+        // Nothing was worn before, or the player changed their chest armor in the meantime.
+        if (original.isEmpty() || !VersionCompat.isGlider(player.getItemBySlot(EquipmentSlot.CHEST), player)) {
+            return;
+        }
+        int index = findInventorySlot(player, stack -> ItemStack.isSameItemSameComponents(stack, original));
+        Slot chest = player.inventoryMenu.getSlot(CHEST_MENU_SLOT);
+        if (index >= 0 && chest.mayPickup(player) && chest.mayPlace(player.getInventory().getItem(index))) {
+            swapChestWith(player, index);
+        }
+    }
+
+    // Swap the chest slot with inventory slot `index` (0-35) using vanilla "swap with hotbar"
+    // clicks, which either swap both items or do nothing, so nothing is ever left on the cursor.
+    // A main-inventory slot goes through the selected hotbar slot, which ends up as it was.
+    private static void swapChestWith(LocalPlayer player, int index) {
+        if (index < Inventory.getSelectionSize()) {
+            VersionCompat.swapWithHotbar(player, CHEST_MENU_SLOT, index);
+        } else {
+            int hotbar = VersionCompat.getSelectedSlot(player.getInventory());
+            // In the inventory menu, main inventory slots 9-35 keep their inventory index.
+            VersionCompat.swapWithHotbar(player, index, hotbar);
+            VersionCompat.swapWithHotbar(player, CHEST_MENU_SLOT, hotbar);
+            VersionCompat.swapWithHotbar(player, index, hotbar);
+        }
+    }
+
+    // Hotbar first, then the main inventory; -1 if nothing matches.
+    private static int findInventorySlot(LocalPlayer player, Predicate<ItemStack> matches) {
+        for (int slot = 0; slot < InventoryMenu.INV_SLOT_END; slot++) {
+            if (matches.test(player.getInventory().getItem(slot))) {
+                return slot;
+            }
+        }
+        return -1;
+    }
+
+    // Inventory clicks go to the player's own inventory menu, so only when no other menu is open.
+    private static boolean canUseInventory(LocalPlayer player) {
+        Minecraft minecraft = Minecraft.getInstance();
+        return minecraft.screen == null && minecraft.gameMode != null
+                && player.containerMenu == player.inventoryMenu && !player.isSpectator();
     }
 
     static int remainingDurability(ItemStack glider) {
