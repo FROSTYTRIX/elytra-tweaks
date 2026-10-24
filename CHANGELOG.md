@@ -34,6 +34,11 @@ All notable changes to ElytraTweaks are documented here.
   the mod's own deploy key always works.
 
 ### Fixed
+- When the safety net folds a deploy that another mod started on the server, it
+  now also stops the gliding on the server. Before, the server kept you gliding
+  until you landed, and the elytra kept losing durability even with its wings
+  folded on your screen. Deploys that only happened on your side are folded
+  without telling the server anything, so it never starts gliding by mistake.
 - The deploy key name and its controls category now show up translated on 26.1.2.
 - The client-only mixins (`LocalPlayer`, elytra sound) are now registered in the
   client mixin list, so they are no longer applied on a dedicated server, where
