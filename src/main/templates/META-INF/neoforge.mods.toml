@@ -46,7 +46,9 @@ displayName="${mod_name}" #mandatory
 
 # The description text for the mod (multi line!) (#mandatory)
 description='''
-A mod that allows to change the keybind that serves to open (and close) the elytras. Idea from : @VaffanClash on discord
+Choose when your elytra opens. Instead of the jump key, use a dedicated key (Left Alt by default) to open your elytra, and press it again to close it mid-air. Idea from: @VaffanClash on Discord.
+
+Also includes: jump key options (blocked, only while holding a firework, or vanilla), toggle or hold mode, a firework takeoff key, a flight HUD (speed, altitude, pitch, rockets, durability), a low durability warning, a wind sound volume slider and an optional chestplate auto swap. Everything can be configured in-game.
 '''
 
 # The [[mixins]] block allows you to declare your mixin config to FML so that it gets loaded.

@@ -124,12 +124,13 @@ public final class ElytraController {
             while (key.consumeClick()) {
                 if (takeoffTicks < 0 && !player.isFallFlying() && !player.isInWater() && hasRocket(player)) {
                     equipGliderFromInventory(player);
-                    if (VersionCompat.hasUsableGlider(player)) {
-                        if (player.onGround()) {
-                            player.jumpFromGround();
-                        }
-                        takeoffTicks = 0;
+                    // No "is an elytra worn?" check: accessory-slot mods (e.g. Elytra Slot) let players
+                    // glide without one in the chest slot, so just try and let the game decide. The
+                    // rocket is only fired once gliding actually starts.
+                    if (player.onGround()) {
+                        player.jumpFromGround();
                     }
+                    takeoffTicks = 0;
                 }
             }
         }
