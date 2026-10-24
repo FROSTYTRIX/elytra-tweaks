@@ -28,18 +28,16 @@ public final class ElytraController {
     // Ticks since a firework takeoff started, or -1 when none is in progress.
     private static int takeoffTicks = -1;
     private static boolean durabilityWarned;
+    // Whether the server last told us our player is gliding (from its entity data, see
+    // EntityMixin). Folding the wings on the client doesn't change it.
+    private static boolean serverGliding;
 
     private ElytraController() {
     }
 
     public static void tick(LocalPlayer player) {
         if (player != lastPlayer) {
-            // New world or respawn: forget the previous player's state.
-            lastPlayer = player;
-            wantGliding = false;
-            deployKeyWasDown = false;
-            takeoffTicks = -1;
-            durabilityWarned = false;
+            reset(player);
         }
 
         // Clear per-flight state once the flight is over (landed, water, server stopped it...).
@@ -52,6 +50,23 @@ public final class ElytraController {
         handleTakeoff(player);
         applySafetyNet(player);
         warnLowDurability(player);
+    }
+
+    public static void onServerGlidingState(LocalPlayer player, boolean gliding) {
+        if (player != lastPlayer) {
+            reset(player);
+        }
+        serverGliding = gliding;
+    }
+
+    // New world or respawn: forget the previous player's state.
+    private static void reset(LocalPlayer player) {
+        lastPlayer = player;
+        wantGliding = false;
+        deployKeyWasDown = false;
+        takeoffTicks = -1;
+        durabilityWarned = false;
+        serverGliding = false;
     }
 
     private static void handleDeployKey(LocalPlayer player) {
@@ -115,14 +130,21 @@ public final class ElytraController {
 
     // Layer 2 (reactive safety net): we're gliding but never asked to be. If the jump
     // setting allows this kind of deploy, accept it once; otherwise fold the wings.
-    // Client-only, no stop packet, so it never traps the player in the prone/crawling
-    // hitbox on the server.
     private static void applySafetyNet(LocalPlayer player) {
         if (Config.SAFETY_NET.get() && player.isFallFlying() && !wantGliding) {
             if (ElytraTweaksState.isNonKeyDeployAllowed(player)) {
                 wantGliding = true;
             } else {
                 player.stopFallFlying();
+                if (serverGliding) {
+                    // Something started this flight on the server, which would keep us gliding
+                    // (and wear the elytra down) until we land. The server is gliding, so
+                    // START_FALL_FLYING makes it stop. Never sent when the server isn't gliding:
+                    // it would start gliding instead, trapping the player in the gliding hitbox.
+                    serverGliding = false;
+                    player.connection.send(new ServerboundPlayerCommandPacket(
+                            player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
+                }
             }
         }
     }
@@ -160,6 +182,7 @@ public final class ElytraController {
 
     private static void stop(LocalPlayer player) {
         wantGliding = false;
+        serverGliding = false;
         player.stopFallFlying();
         player.connection.send(new ServerboundPlayerCommandPacket(
                 player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING));
