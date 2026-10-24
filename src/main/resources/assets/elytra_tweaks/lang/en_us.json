@@ -22,6 +22,9 @@
   "elytra_tweaks.configuration.safetyNet": "Safety Net",
   "elytra_tweaks.configuration.safetyNet.tooltip": "Folds the wings when the elytra opens in a way the Jump Key Deploy setting doesn't allow (for example through another mod). Turning it off removes the one-frame flicker some modpacks show, but those deploys are then no longer stopped.",
 
+  "elytra_tweaks.configuration.autoSwap": "Auto Swap Chestplate",
+  "elytra_tweaks.configuration.autoSwap.tooltip": "When you use the deploy or takeoff key without wearing an elytra, puts one on from your inventory, and puts your chestplate back when you land. §cWarning: this moves items in your inventory for you. Some servers consider that cheating, so check the server's rules before turning it on.",
+
   "elytra_tweaks.configuration.flightHud": "Flight HUD",
   "elytra_tweaks.configuration.flightHud.tooltip": "Shows speed, altitude, pitch and elytra durability next to the crosshair while gliding.",
 
@@ -36,6 +39,7 @@
   "elytra_tweaks.hud.speed": "Speed: %s m/s",
   "elytra_tweaks.hud.altitude": "Altitude: %s",
   "elytra_tweaks.hud.pitch": "Pitch: %s°",
+  "elytra_tweaks.hud.rockets": "Rockets: %s",
   "elytra_tweaks.hud.durability": "Elytra: %s/%s",
 
   "elytra_tweaks.message.durability_low": "Elytra about to break: %s durability left"
