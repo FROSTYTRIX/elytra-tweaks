@@ -9,10 +9,11 @@ All notable changes to ElytraTweaks are documented here.
   saved in `config/elytra_tweaks-client.toml`.
 - **Deploy Key Mode:** `Toggle` (press to open, press again to close; default)
   or `Hold` (the elytra stays open only while the key is held).
-- **Jump Key Deploy:** choose what the vanilla jump key may do while falling:
+- **Jump Key Deploy:** choose what the vanilla jump key may do while falling
+  (the mod's own deploy key always works, whatever this is set to):
   - `Blocked` (default): never opens the elytra, as in 1.0.5.
-  - `Only With Firework`: opens it only while you hold a firework rocket in
-    either hand, so normal jumps and jump-crits never deploy it.
+  - `Only While Holding Firework`: opens it only while you hold a firework
+    rocket in either hand, so normal jumps and jump-crits never deploy it.
   - `Vanilla`: opens it like vanilla.
 - **Safety Net** toggle: turn off the reactive wing-folding if it causes the
   one-frame flicker in your modpack (those mods' deploys are then no longer
@@ -36,8 +37,6 @@ All notable changes to ElytraTweaks are documented here.
 ### Changed
 - The default deploy key is now Left Alt on every version (it was G on 26.1.2).
   Existing installs keep whatever key is already saved in their options.
-- "Jump Key Deploy" now says clearly that it only affects the vanilla jump key;
-  the mod's own deploy key always works.
 
 ### Fixed
 - When the safety net folds a deploy that another mod started on the server, it
@@ -49,6 +48,13 @@ All notable changes to ElytraTweaks are documented here.
 - The client-only mixins (`LocalPlayer`, elytra sound) are now registered in the
   client mixin list, so they are no longer applied on a dedicated server, where
   those classes don't exist.
+
+### Known limitations
+- Elytras worn in an accessory slot (e.g. with Elytra Slot): the deploy key and
+  the Firework Takeoff let the game decide whether you can glide, like vanilla
+  does, but the HUD durability line, the Low Durability Warning and Auto Swap
+  Chestplate only look at the chest slot (and, on 26.1.2, the other equipment
+  slots), so they don't see such an elytra.
 
 ## [1.0.5]
 
